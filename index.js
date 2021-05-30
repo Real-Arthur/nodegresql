@@ -2,13 +2,13 @@ const express = require('express');
 const app = express();
 // Route import
 const titleRouter = require('./routes/title.router');
-const home = require('./routes/home.router');
+const homeRouter = require('./routes/home.router');
 
 app.use(express.json());
 app.use(express.urlencoded());
 
 /// Routes ///
-app.use('/', home);
+app.use('/', homeRouter);
 app.use('/api/title', titleRouter);
 
 const PORT = process.env.PORT || 5000;
