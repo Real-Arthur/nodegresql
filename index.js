@@ -1,12 +1,11 @@
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
-const port = 5000;
 // Route import
 const titleRouter = require('./routes/title.router');
 const home = require('./routes/home.router');
 
 app.use(express.json());
+app.use(express.urlencoded());
 
 /// Routes ///
 app.use('/', home);

@@ -30,3 +30,13 @@ describe('test title router data', () => {
     expect( testLength(response.body) ).toBe(true);
   })
 })
+
+describe('test get title by id', () => {
+  it('should return a title with an id matching param id', async () => {
+    const response = await request.get("/api/title/8");
+    let url = response.request.url;
+    let requestId = Number(url.substring(url.lastIndexOf('/') + 1));
+    let responseId = response.body[0].id
+    expect(responseId).toBe(Number(requestId))
+  })
+})
