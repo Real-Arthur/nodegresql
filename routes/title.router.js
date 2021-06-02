@@ -1,9 +1,10 @@
 const express = require('express');
 const pool = require('../pool');
 const router = express.Router();
+const { authenticateToken } = require('../authenticatToken');
 
 /** GET ALL TRACKS **/
-router.get('/', (req, res) => {
+router.get('/', authenticateToken, (req, res) => {
   // GET route code here
   let queryString = `
   SELECT "track" FROM "songs";
@@ -18,7 +19,7 @@ router.get('/', (req, res) => {
 });
 
 /** GET TRACK INFO BY ID **/
-router.get('/:id', (req, res) => {
+router.get('/:id', authenticateToken, (req, res) => {
   let id = req.params.id;
   let queryString = `
   SELECT * FROM "songs"

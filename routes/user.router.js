@@ -2,33 +2,31 @@ const express = require('express');
 const pool = require('../pool');
 const router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { authenticateToken } = require('../authenticatToken');
+const dotenv = require('dotenv');
 const saltRounds = 10;
+dotenv.config();
 
 // Handles Ajax request for user information if user is authenticated
 router.get('/', (req, res) => {
   // Send back user object from the session (previously queried from the database)
-  res.send(req.user);
+  res.sendStatus(200);
 });
 
-// Handles POST request with new user data
-// The only thing different from this and every other post we've seen
-// is that the password gets encrypted before being inserted
-router.post('/register', (req, res, next) => {
+router.post('/register', async (req, res, next) => {
   let username = req.body.username;
   let password = req.body.password;
-  // salt password
+
   bcrypt.genSalt(saltRounds, (err, salt) => {
-    
     if(err) {
       return 'error in salting'
     }
   // hash password
     bcrypt.hash(password, salt, (err, hash) => {
-    
       if(err) {
       return 'error in hashing'
       }
-
       const queryText = `
         INSERT INTO "user" (username, password)
         VALUES ($1, $2) RETURNING id`;
@@ -38,6 +36,7 @@ router.post('/register', (req, res, next) => {
         .catch(() => res.sendStatus(500));
     })
   })
+});
 
   router.post('/login', (req, res) => {
     let username = req.body.username;
@@ -47,9 +46,8 @@ router.post('/register', (req, res, next) => {
       let passwordDB = result.rows[0].password
       bcrypt.compare(passwordInput, passwordDB, (err, result) => {
         if(result) {
-          console.log('horray');
-          res.send(result.rows[0].username);
-          res.sendStatus(200);
+          const accessToken = jwt.sign({username: req.body.username}, process.env.TOKEN_SECRET)
+          res.json({token: accessToken})
         }
         else {
           console.log('no good');
@@ -61,12 +59,18 @@ router.post('/register', (req, res, next) => {
       console.log(err);
       res.sendStatus(500);
     })
-
-  })
-
-
-
-
 });
+
+// function authenticateToken(req, res, next) {
+//   const authHeader = req.headers['authorization'];
+//   const token = authHeader && authHeader.split(' ')[1];
+//   if(token === null) return res.sendStatus(401)
+
+//   jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
+//     if(err) return res.sendStatus(403)
+//     req.user = user 
+//     next()
+//   })
+// }
 
 module.exports = router;
