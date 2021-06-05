@@ -3,16 +3,15 @@ const pool = require('../pool');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { authenticateToken } = require('../authenticatToken');
 const dotenv = require('dotenv');
-const saltRounds = 10;
 dotenv.config();
+const saltRounds = 10;
 
 router.get('/', (req, res) => {
   res.sendStatus(200);
 });
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', async (req, res) => {
   let username = req.body.username;
   let password = req.body.password;
   // salt password
@@ -56,5 +55,6 @@ router.post('/login', (req, res) => {
     res.sendStatus(500);
   })
 });
+
 
 module.exports = router;
