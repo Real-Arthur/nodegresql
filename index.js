@@ -8,11 +8,10 @@ const expressSession = require('express-session')({
   resave: true,
   saveUninitialized: true
 })
-
 // Route import
-const titleRouter = require('./routes/title.router');
 const homeRouter = require('./routes/home.router');
-const userRouter = require('./routes/user.router');
+const titlesRouter = require('./routes/titles.router');
+const usersRouter = require('./routes/users.router');
 // Middleware
 app.use(express.static(__dirname));
 app.use(express.json());
@@ -22,8 +21,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 /// Routes ///
 app.use('/', homeRouter);
-app.use('/api/title', titleRouter);
-app.use('/api/user', userRouter);
+app.use('/api/titles', titlesRouter);
+app.use('/api/users', usersRouter);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

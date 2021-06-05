@@ -1,7 +1,7 @@
 const express = require('express');
 const pool = require('../pool');
 const router = express.Router();
-const { authenticateToken } = require('../authenticatToken');
+const { authenticateToken } = require('../authenticateToken');
 
 /** GET ALL TRACKS **/
 router.get('/', authenticateToken, (req, res) => {
