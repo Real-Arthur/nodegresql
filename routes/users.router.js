@@ -1,6 +1,7 @@
 const express = require('express');
 const pool = require('../pool');
 const router = express.Router();
+const axios = require('axios')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
@@ -9,8 +10,20 @@ dotenv.config();
 const saltRounds = 10;
 const emitter = new EventEmitter();
 
-emitter.on('userRegistered', () => {
-    console.log('a user has been registered')
+emitter.on('userRegistered', (username, password, host) => {
+    console.log('a user has been registered with id username password: ', username, password, host);
+    let url = 'http://' + host + '/api/users/login';
+    console.log('url', url);
+    axios.post(url, {
+      username: username,
+      password: password
+    })
+    .then(res => {
+      console.log('Logged in', res.data.token);
+    })
+    .catch(err => {
+      console.log('err', err.code);
+    })
   })
 
 router.get('/', (req, res) => {
@@ -31,8 +44,9 @@ router.post('/register', async (req, res) => {
         VALUES ($1, $2) RETURNING id`;
       pool
         .query(queryText, [username, hash])
-        .then(() => {
-          emitter.emit('userRegistered')
+        .then((result) => {
+          let host = req.headers.host.split(' ');
+          emitter.emit('userRegistered', username, password, host[0])
           res.sendStatus(201)
         })
         .catch(() => res.sendStatus(500));
