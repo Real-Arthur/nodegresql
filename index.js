@@ -20,9 +20,21 @@ app.use(expressSession);
 app.use(passport.initialize());
 app.use(passport.session());
 /// Routes ///
+app.use((req, res, next) => {
+  console.log('host', req.hostname);
+  console.log('path', req.path);
+  console.log('method', req.method);
+  next()
+})
 app.use('/', homeRouter);
 app.use('/api/titles', titlesRouter);
 app.use('/api/users', usersRouter);
+//
+app.use((req , res, done) => {
+  console.log('page not found')
+  res.status(404)
+  done()
+})
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

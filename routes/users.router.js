@@ -13,7 +13,6 @@ const emitter = new EventEmitter();
 emitter.on('userRegistered', (username, password, host) => {
     console.log('a user has been registered with id username password: ', username, password, host);
     let url = 'http://' + host + '/api/users/login';
-    console.log('url', url);
     axios.post(url, {
       username: username,
       password: password
@@ -22,12 +21,12 @@ emitter.on('userRegistered', (username, password, host) => {
       console.log('Logged in', res.data.token);
     })
     .catch(err => {
-      console.log('err', err.code);
+      console.log('err', err);
     })
   })
 
 router.get('/', (req, res) => {
-  res.sendStatus(200);
+  res.send(200);
 });
 
 router.post('/register', async (req, res) => {
@@ -47,9 +46,9 @@ router.post('/register', async (req, res) => {
         .then((result) => {
           let host = req.headers.host.split(' ');
           emitter.emit('userRegistered', username, password, host[0])
-          res.sendStatus(201)
+          res.send(201)
         })
-        .catch(() => res.sendStatus(500));
+        .catch(() => res.send(500));
     })
   })
 });
@@ -68,13 +67,13 @@ router.post('/login', (req, res) => {
       }
       else {
         console.log('Password did not match database');
-        res.sendStatus(400);
+        res.send(400);
       }
     })
   })
   .catch(err => {
     console.log(err);
-    res.sendStatus(500);
+    res.send(500);
   })
 });
 
