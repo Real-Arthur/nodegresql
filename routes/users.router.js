@@ -4,8 +4,14 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const EventEmitter = require('events');
 dotenv.config();
 const saltRounds = 10;
+const emitter = new EventEmitter();
+
+emitter.on('userRegistered', () => {
+    console.log('a user has been registered')
+  })
 
 router.get('/', (req, res) => {
   res.sendStatus(200);
@@ -20,13 +26,15 @@ router.post('/register', async (req, res) => {
   // hash password
     bcrypt.hash(password, salt, (err, hash) => {
       if(err) throw err;
-      
       const queryText = `
         INSERT INTO "user" (username, password)
         VALUES ($1, $2) RETURNING id`;
       pool
         .query(queryText, [username, hash])
-        .then(() => res.sendStatus(201))
+        .then(() => {
+          emitter.emit('userRegistered')
+          res.sendStatus(201)
+        })
         .catch(() => res.sendStatus(500));
     })
   })
